@@ -1,35 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>Starbucks Favorites</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Iced Brown Sugar Espresso</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Poppins, sans-serif; }
 
 body {
   background: linear-gradient(180deg, #1e3932, #0f241e);
   color: #fff;
-  overflow-x: hidden;
 }
 
-/* MOBILE ONLY */
 @media (min-width: 768px) {
   body::before {
-    content: "This site is designed for mobile only 📱";
+    content: "Mobile view only 📱";
     position: fixed;
     inset: 0;
     background: #000;
-    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,40 +30,27 @@ body {
 }
 
 header {
-  padding: 24px;
   text-align: center;
+  padding: 24px;
 }
 
 header h1 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 600;
 }
 
 header p {
   opacity: 0.85;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-/* 3D CANVAS */
-#canvas-container {
+#canvas {
   width: 100%;
-  height: 320px;
+  height: 340px;
 }
 
-/* DRINKS */
 .section {
   padding: 20px;
-}
-
-.section h2 {
-  font-size: 1.3rem;
-  margin-bottom: 12px;
-}
-
-.drinks {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
 }
 
 .card {
@@ -80,28 +58,15 @@ header p {
   padding: 16px;
   border-radius: 16px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .card h3 {
-  font-size: 1.1rem;
+  margin-bottom: 8px;
 }
 
-.card p {
+.card li {
   font-size: 0.85rem;
-  opacity: 0.85;
-}
-
-/* CTA */
-.cta {
-  margin: 24px;
-  padding: 18px;
-  background: #00754a;
-  border-radius: 30px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1rem;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  opacity: 0.9;
 }
 </style>
 </head>
@@ -109,37 +74,28 @@ header p {
 <body>
 
 <header>
-  <h1>Our Starbucks Favorites ☕</h1>
-  <p>Tap & rotate the cup</p>
+  <h1>Iced Brown Sugar Shaken Espresso</h1>
+  <p>Tap & rotate the drink ☕</p>
 </header>
 
-<div id="canvas-container"></div>
+<div id="canvas"></div>
 
 <section class="section">
-  <h2>Customer Favorites</h2>
-  <div class="drinks">
-    <div class="card">
-      <h3>Caramel Macchiato</h3>
-      <p>Rich espresso with vanilla & caramel drizzle</p>
-    </div>
-    <div class="card">
-      <h3>Matcha Latte</h3>
-      <p>Smooth matcha with creamy milk</p>
-    </div>
-    <div class="card">
-      <h3>Cold Brew</h3>
-      <p>Slow-steeped, bold & refreshing</p>
-    </div>
+  <div class="card">
+    <h3>Drink Build</h3>
+    <ul>
+      <li>• 1 Pump Brown Sugar</li>
+      <li>• 1 Pump White Mocha</li>
+      <li>• Vanilla Sweet Cream</li>
+      <li>• No Oat Milk</li>
+    </ul>
   </div>
 </section>
 
-<div class="cta">Visit Us Today ☕</div>
-
-<!-- THREE.JS -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 <script>
-const container = document.getElementById("canvas-container");
+const container = document.getElementById("canvas");
 
 // Scene
 const scene = new THREE.Scene();
@@ -149,9 +105,9 @@ const camera = new THREE.PerspectiveCamera(
   45,
   container.clientWidth / container.clientHeight,
   0.1,
-  1000
+  100
 );
-camera.position.z = 5;
+camera.position.z = 6;
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -160,60 +116,98 @@ renderer.setPixelRatio(window.devicePixelRatio);
 container.appendChild(renderer.domElement);
 
 // Lights
-scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-const light = new THREE.DirectionalLight(0xffffff, 0.8);
-light.position.set(5,5,5);
-scene.add(light);
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+dirLight.position.set(5, 5, 5);
+scene.add(dirLight);
 
-// Starbucks Cup (simple 3D shape)
-const geometry = new THREE.CylinderGeometry(1, 0.9, 2.5, 32);
-const material = new THREE.MeshStandardMaterial({
+// CUP GROUP
+const drink = new THREE.Group();
+scene.add(drink);
+
+// CUP (glass)
+const cupGeo = new THREE.CylinderGeometry(1.2, 1.1, 3.2, 32, 1, true);
+const cupMat = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
-  roughness: 0.3,
-  metalness: 0.1
+  transparent: true,
+  opacity: 0.15,
+  roughness: 0,
+  transmission: 1
 });
-const cup = new THREE.Mesh(geometry, material);
-scene.add(cup);
+drink.add(new THREE.Mesh(cupGeo, cupMat));
 
-// Lid
-const lidGeo = new THREE.CylinderGeometry(1.05, 1.05, 0.25, 32);
-const lidMat = new THREE.MeshStandardMaterial({ color: 0x1e3932 });
-const lid = new THREE.Mesh(lidGeo, lidMat);
-lid.position.y = 1.4;
-scene.add(lid);
+// ESPRESSO + BROWN SUGAR BASE
+const espressoGeo = new THREE.CylinderGeometry(1.05, 1.0, 1.4, 32);
+const espressoMat = new THREE.MeshStandardMaterial({
+  color: 0x6f4e37
+});
+const espresso = new THREE.Mesh(espressoGeo, espressoMat);
+espresso.position.y = -0.8;
+drink.add(espresso);
 
-// Touch rotation
-let isTouching = false;
+// WHITE MOCHA SWIRL
+const mochaGeo = new THREE.CylinderGeometry(1.02, 0.98, 0.4, 32);
+const mochaMat = new THREE.MeshStandardMaterial({
+  color: 0xcaa472
+});
+const mocha = new THREE.Mesh(mochaGeo, mochaMat);
+mocha.position.y = -0.1;
+drink.add(mocha);
+
+// VANILLA SWEET CREAM FOAM
+const foamGeo = new THREE.CylinderGeometry(1.05, 1.05, 0.6, 32);
+const foamMat = new THREE.MeshStandardMaterial({
+  color: 0xf8f1e7
+});
+const foam = new THREE.Mesh(foamGeo, foamMat);
+foam.position.y = 1.1;
+drink.add(foam);
+
+// ICE CUBES
+const iceGeo = new THREE.BoxGeometry(0.35, 0.35, 0.35);
+const iceMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  transparent: true,
+  opacity: 0.6
+});
+
+for (let i = 0; i < 8; i++) {
+  const ice = new THREE.Mesh(iceGeo, iceMat);
+  ice.position.set(
+    (Math.random() - 0.5) * 1.4,
+    Math.random() * 1.2 - 0.2,
+    (Math.random() - 0.5) * 1.4
+  );
+  drink.add(ice);
+}
+
+// TOUCH ROTATION
+let touching = false;
 let lastX = 0;
 
 container.addEventListener("touchstart", e => {
-  isTouching = true;
+  touching = true;
   lastX = e.touches[0].clientX;
 });
 
 container.addEventListener("touchmove", e => {
-  if (!isTouching) return;
+  if (!touching) return;
   const delta = e.touches[0].clientX - lastX;
-  cup.rotation.y += delta * 0.01;
-  lid.rotation.y += delta * 0.01;
+  drink.rotation.y += delta * 0.01;
   lastX = e.touches[0].clientX;
 });
 
-container.addEventListener("touchend", () => {
-  isTouching = false;
-});
+container.addEventListener("touchend", () => touching = false);
 
-// Animation
+// ANIMATION
 function animate() {
   requestAnimationFrame(animate);
-  cup.rotation.y += 0.003;
-  lid.rotation.y += 0.003;
+  drink.rotation.y += 0.002;
   renderer.render(scene, camera);
 }
-
 animate();
 
-// Resize
+// RESIZE
 window.addEventListener("resize", () => {
   camera.aspect = container.clientWidth / container.clientHeight;
   camera.updateProjectionMatrix();
